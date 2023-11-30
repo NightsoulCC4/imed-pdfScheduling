@@ -17,6 +17,7 @@ public class PDFRepository {
     @Value("${password}")
     private String password;
 
+    // Search patient id from database which they are active.
     public String searchPatientIdByHNCode(String hncode){
 
         String data = "";

@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-// import com.fasterxml.jackson.core.JsonGenerationException;
-// import com.fasterxml.jackson.databind.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -17,7 +15,6 @@ import java.lang.reflect.Type;
 
 import java.net.*;
 import java.io.*;
-// import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
@@ -64,10 +61,8 @@ public class PDFService {
                 for (File pdfFile : files) {
                     try {
                         Map<String, String> json = convertPdfToJson(pdfFile);
-                        // pdfRepository.insertIntoDocumentScan(json);
                         convertedJsonList.add(json);
                         connectToServer(json);
-                        // ExportJson(pdfFile, convertedJsonList, jsonFolder);
                         moveFileToOutputFolder(pdfFile, "Success");
                         logger.info("Convert success!");
                     } catch (IOException e) {
@@ -83,20 +78,12 @@ public class PDFService {
 
         Map<String, String> jsonMap = new HashMap<>();
         jsonMap.put("patient_id", getPatientID(dataFolder + pdfFile.getName()));
-        // jsonMap.put("visit_id", null);
-        // jsonMap.put("prescription_id", null);
         jsonMap.put("image_file_name", "PFT_" + pdfFile.getName());
         jsonMap.put("scan_id", user);
         jsonMap.put("scan_spid", location);
         jsonMap.put("scan_date", FormatString.getScanDate(pdfFile.getName()));
         jsonMap.put("scan_time", FormatString.getScanTime(pdfFile.getName()));
-        // jsonMap.put("update_eid", null);
-        // jsonMap.put("update_spid", null);
-        // jsonMap.put("update_date", null);
-        // jsonMap.put("update_time", null);
         jsonMap.put("folder_name", "PFT");
-        // jsonMap.put("reference_image_id", null);
-
         jsonMap.put("base64", PDFToBase64.convertPdfToBase64(dataFolder +
                 pdfFile.getName()).toString());
 
@@ -114,15 +101,6 @@ public class PDFService {
 
         Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
     }
-
- /*    private static void ExportJson(File pdfFile, List<Map<String, String>> convertedJsonList, String jsonFolder)
-            throws JsonGenerationException, JsonMappingException, IOException {
-        String exportFileName = pdfFile.getName().replace(".pdf", ".json");
-        ObjectMapper mapper = new ObjectMapper();
-
-        File outputFile = new File(jsonFolder, exportFileName);
-        mapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, convertedJsonList);
-    } */
 
     private String getPatientID(String pdfFilePath) {
         String text = "", patient_id = "";
@@ -197,24 +175,12 @@ public class PDFService {
                 // Handle the response as you needed.
                 Type type = new TypeToken<Map<String, String>>() {
                 }.getType();
-                // System.out.println("fffff: " + response);
-                // System.out.println("Response: " + gson.fromJson(response.toString(), type));
                 Map<String, String> test = gson.fromJson(response.toString(), type);
                 if(json.get("base64").length() == test.get("base64").length())
                     System.out.println("-------------EQUAL!!-------------");
                 else{
                     System.out.println("------------NO----------");
                 }
-                /* PDFToBase64.convertBase64ToPDF(json.get("base64").toString(), json.get("image_file_name").toString()); */
-                /* PDFToBase64.convertBase64ToPDF(test.get("base64").toString(), json.get("image_file_name").toString()); */
-                /* for(int i = 0 ; i < formData.get("base64").length() ; i++){
-                    Boolean a = true;
-                    if(formData.get("base64").charAt(i) == json.get("base64").charAt(i))
-                        System.out.println("Line " + i + " :" + a + " And the char is " + formData.get("base64").charAt(i) + " And " + (char) json.get("base64").charAt(i));
-                    else
-                        System.out.println("Line " + i + " :" + !a + " And the char is " + formData.get("base64").charAt(i) + " And " + json.get("base64").charAt(i));
-                } */
-
             }
             connection.disconnect();
         } catch (Exception e) {
